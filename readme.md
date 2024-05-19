@@ -74,7 +74,7 @@ order_info(订单信息表):
 | 字段               | 数据类型       | 说明                        |
 | ------------------ | -------------- | --------------------------- |
 | order_id           | bigint         | 订单号                      |
-| membee_name        | varchar(10)    | 会员名                      |
+| member_name        | varchar(10)    | 会员名                      |
 | shop_name          | varchar(32)    | 店铺名                      |
 | shop_location      | varchar(10)    | 店铺所在地                  |
 | order_time         | date           | 点餐时间                    |
