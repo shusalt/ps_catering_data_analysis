@@ -116,3 +116,7 @@ ods_member_info(会员信息表):
 | membership_join_date | date        | 入会时间 |
 | phone_number         | bigint      | 手机号   |
 | membership_level     | varchar(10) | 会员等级 |
+
+# 业务矩阵总线
+
+![业务总线矩阵](./image/业务总线矩阵.png)
