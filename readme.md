@@ -69,7 +69,7 @@
 
 对与原始业务数据，存储ODS层中，采用Doris的duplicate数据表模型，进行设计
 
-order_info(订单信息表):
+ods_order_info(订单信息表):
 
 | 字段               | 数据类型       | 说明                        |
 | ------------------ | -------------- | --------------------------- |
@@ -82,7 +82,7 @@ order_info(订单信息表):
 | is_paid            | int            | 是否结算：0.未结算.1.已结算 |
 | payment_time       | date           | 结算时间                    |
 
-order_detail(订单详情表):
+ods_order_detail(订单详情表):
 
 | 字段        | 数据类型       | 说明     |
 | ----------- | -------------- | -------- |
@@ -93,7 +93,7 @@ order_detail(订单详情表):
 | detail_date | date           | 日期     |
 | detail_time | time           | 时间     |
 
-dish_info(菜品信息表):
+ods_dish_info(菜品信息表):
 
 | 字段                 | 数据类型       | 说明     |
 | -------------------- | -------------- | -------- |
@@ -105,7 +105,7 @@ dish_info(菜品信息表):
 | recommendation_level | float          | 推荐度   |
 | dish_category        | varchar(10)    | 菜品类别 |
 
-member_info(会员信息表):
+ods_member_info(会员信息表):
 
 | 字段                 | 数据类型    | 说明     |
 | -------------------- | ----------- | -------- |
