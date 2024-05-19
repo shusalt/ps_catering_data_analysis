@@ -84,14 +84,14 @@ order_info(订单信息表):
 
 order_detail(订单详情表):
 
-| 字段      | 数据类型       | 说明     |
-| --------- | -------------- | -------- |
-| order_id  | bigint         | 订单号   |
-| dish_name | varchar(32)    | 菜品名称 |
-| price     | decimal(16, 2) | 价格     |
-| quantity  | int            | 数量     |
-| date      | date           | 日期     |
-| time      | time           | 时间     |
+| 字段        | 数据类型       | 说明     |
+| ----------- | -------------- | -------- |
+| order_id    | bigint         | 订单号   |
+| dish_name   | varchar(32)    | 菜品名称 |
+| price       | decimal(16, 2) | 价格     |
+| quantity    | int            | 数量     |
+| detail_date | date           | 日期     |
+| detail_time | time           | 时间     |
 
 dish_info(菜品信息表):
 
