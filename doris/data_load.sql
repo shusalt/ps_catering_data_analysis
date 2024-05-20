@@ -42,7 +42,7 @@ create table if not exists ods_dish_info(
     `price` decimal(16, 2) comment '价格',
     `cost` decimal(16, 2) comment '成本',
     `recommendation_level` float comment '推荐度',
-    `dish_category` varchar(32) comment '菜品类别'
+    `dish_category` varchar(20) comment '菜品类别'
 )
 duplicate key(`dish_id`, `dish_name`)
 distributed by hash(`dish_id`) buckets 1
@@ -91,7 +91,7 @@ properties("replication_num" = "1");
 # curl --location-trusted -u root: \
 #     -H "Expect:100-continue" \
 #     -H "column_separator:," \
-#     -H "columns:dish_id, dish_name, flavor, price2, cost, recommendation_level, dish_category" \
+#     -H "columns:dish_id, dish_name, flavor, price, cost, recommendation_level, dish_category" \
 #     -T 菜品信息表.csv \
 #     -XPUT http://172.20.10.3:8070/api/private_station/ods_dish_info/_stream_load
 #

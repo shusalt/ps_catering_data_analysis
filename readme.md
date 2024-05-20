@@ -65,7 +65,7 @@
 | phone_number         | 手机号   |
 | membership_level     | 会员等级 |
 
-# ODS层比表设计
+# ODS层表设计
 
 对与原始业务数据，存储ODS层中，采用Doris的duplicate数据表模型，进行设计
 
@@ -87,7 +87,7 @@ ods_order_detail(订单详情表):
 | 字段        | 数据类型       | 说明     |
 | ----------- | -------------- | -------- |
 | order_id    | bigint         | 订单号   |
-| dish_name   | varchar(32)    | 菜品名称 |
+| dish_name   | varchar(64)    | 菜品名称 |
 | price       | decimal(16, 2) | 价格     |
 | quantity    | int            | 数量     |
 | detail_date | date           | 日期     |
@@ -98,12 +98,12 @@ ods_dish_info(菜品信息表):
 | 字段                 | 数据类型       | 说明     |
 | -------------------- | -------------- | -------- |
 | dish_id              | bigint         | 菜品id   |
-| dish_name            | varchar(32)    | 菜品名称 |
+| dish_name            | varchar(64)    | 菜品名称 |
 | flavor               | varchar(10)    | 菜品口味 |
 | price                | decimal(16, 2) | 价格     |
 | cost                 | decimal(16, 2) | 成本     |
 | recommendation_level | float          | 推荐度   |
-| dish_category        | varchar(10)    | 菜品类别 |
+| dish_category        | varchar(20)    | 菜品类别 |
 
 ods_member_info(会员信息表):
 
@@ -120,3 +120,55 @@ ods_member_info(会员信息表):
 # 业务矩阵总线
 
 ![业务总线矩阵](./image/业务总线矩阵.png)
+
+# DWS与DIM层表设计
+
+根据业务业务总线矩阵进行多维数据模型设计，设计事实表与维度表
+
+## dim_member_info(会员维度表)
+
+采用unique数据模型
+
+| 字段                 | 数据类型    | 说明     |
+| -------------------- | ----------- | -------- |
+| member_id            | bigint      | 会员号   |
+| member_name          | varchar(10) | 会员名   |
+| gender               | varchar(3)  | 性别     |
+| age                  | int         | 年龄     |
+| membership_join_date | datetime    | 入会时间 |
+| phone_number         | bigint      | 手机号   |
+| membership_level     | varchar(10) | 会员等级 |
+
+## dim_dish_info(菜品维度表)
+
+使用unique数据模型
+
+| 字段                 | 数据类型       | 说明     |
+| -------------------- | -------------- | -------- |
+| dish_id              | bigint         | 菜品id   |
+| dish_name            | varchar(64)    | 菜品名称 |
+| flavor               | varchar(10)    | 菜品口味 |
+| price                | decimal(16, 2) | 价格     |
+| cost                 | decimal(16, 2) | 成本     |
+| recommendation_level | float          | 推荐度   |
+| dish_category        | varchar(32)    | 菜品类别 |
+
+## dwd_order_detail (下单明细事实表)
+
+使用duplicate数据模型
+
+| 字段               | 数据类型       | 说明                        |
+| ------------------ | -------------- | --------------------------- |
+| order_id           | bigint         | 订单id                      |
+| menber_id          | bigint         | 会员id                      |
+| dish_id            | bigint         | 菜品id                      |
+| shop_name          | varchar(32)    | 店铺名                      |
+| shop_location      | varchar(10)    | 店铺所在地                  |
+| order_time         | datetime       | 点餐时间                    |
+| payment_time       | datetime       | 结算时间                    |
+| is_paid            | int            | 是否结算(0:未结算,1:已结算) |
+| consumption_amount | decimal(16, 2) | 消费金额                    |
+| price              | decimal(16, 2) | 单品价格                    |
+| quantity           | int            | 数量                        |
+
+# 统计指标体系
