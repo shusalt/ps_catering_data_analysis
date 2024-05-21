@@ -147,3 +147,71 @@ left join(
     from private_station.ods_dish_info
 ) dish_info
 on order_detail.dish_name = dish_info.dish_name;
+
+
+
+
+
+-- 统计指标需求分析
+select
+    order_id,
+    order_detail.member_id,
+    order_detail.dish_id,
+    shop_name,
+    shop_location,
+    order_time,
+    payment_time,
+    is_paid,
+    consumption_amount,
+    order_detail.price,
+    quantity,
+    dish_name,
+    flavor,
+    cost,
+    recommendation_level,
+    dish_category,
+    member_name,
+    gender,
+    age,
+    membership_join_date,
+    phone_number,
+    membership_level
+from (
+    select
+        order_id,
+        member_id,
+        dish_id,
+        shop_name,
+        shop_location,
+        order_time,
+        payment_time,
+        is_paid,
+        consumption_amount,
+        price,
+        quantity
+    from dwd_order_detail
+) order_detail
+left join (
+    select
+        dish_id,
+        dish_name,
+        flavor,
+        price,
+        cost,
+        recommendation_level,
+        dish_category
+    from dim_dish_info
+) dish_info
+on order_detail.dish_id = dish_info.dish_id
+left join (
+    select
+        member_id,
+        member_name,
+        gender,
+        age,
+        membership_join_date,
+        phone_number,
+        membership_level
+    from dim_member_info
+) member_info
+on order_detail.member_id = member_info.member_id;
