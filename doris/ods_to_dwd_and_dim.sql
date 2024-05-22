@@ -101,6 +101,7 @@ create index if not exists shop_location_idx on dwd_order_detail (shop_location)
 
 
 -- ods to dwd_order_detail
+-- 首日装载
 insert into private_station.dwd_order_detail
 select
     order_info.order_id,
@@ -127,6 +128,61 @@ from (
         is_paid,
         payment_time
     from private_station.ods_order_info
+) order_info
+inner join(
+    select
+        order_id,
+        dish_name,
+        price,
+        quantity
+    from private_station.ods_order_detail
+) order_detail
+on order_info.order_id = order_detail.order_id
+inner join(
+    select
+        member_id,
+        member_name
+    from private_station.ods_member_info
+) member_info
+on order_info.member_name = member_info.member_name
+inner join(
+    select
+        dish_id,
+        dish_name
+    from private_station.ods_dish_info
+) dish_info
+on order_detail.dish_name = dish_info.dish_name;
+
+
+-- 每日装载
+# insert into private_station.dwd_order_detail
+select
+    order_info.order_id,
+    member_info.member_id,
+    dish_info.dish_id,
+    order_info.shop_name,
+    order_info.shop_location,
+    order_info.order_time,
+    order_info.payment_time,
+    order_info.is_paid,
+    order_info.consumption_amount,
+    order_detail.price,
+    order_detail.quantity
+from (
+    select
+        if(substr(order_id, 9, 1) = '0',
+           concat(substring(order_id, 1, 8), substring(order_id, 10)),
+           order_id) order_id,
+        member_name,
+        shop_name,
+        shop_location,
+        order_time,
+        consumption_amount,
+        is_paid,
+        payment_time
+    from private_station.ods_order_info
+    -- 索取当日时间
+    where date(payment_time) = date_add('2016-09-01', -1)
 ) order_info
 inner join(
     select

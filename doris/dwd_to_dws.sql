@@ -18,6 +18,7 @@ properties(
 -- 为 dws_member_dish_stat 的 dish_id,dish_category创建bitmap索引
 create index if not exists dish_name_idx on dws_member_dish_stat (dish_category) using bitmap comment '类品名称列bitmap索引';
 
+-- 首日装载
 insert into private_station.dws_member_dish_stat
 select
     order_detail.member_id,
@@ -63,6 +64,53 @@ group by
     dish_info.dish_category,
     date(payment_time);
 
+-- 每日装载
+# insert into private_station.dws_member_dish_stat
+select
+    order_detail.member_id,
+    member_info.member_name,
+    dish_info.dish_category,
+    date(payment_time) pay_date,
+    bitmap_count(bitmap_union(to_bitmap(order_id))) order_count,
+    sum(order_detail.quantity) slaves_volume,
+    sum(order_detail.quantity * order_detail.price) total_sales
+from (
+    select
+        order_id,
+        member_id,
+        dish_id,
+        shop_name,
+        shop_location,
+        order_time,
+        payment_time,
+        is_paid,
+        consumption_amount,
+        price,
+        quantity
+    from dwd_order_detail
+    -- 获取当日增量数据
+    where is_paid = '1' and date(payment_time) = date_add('2016-09-01', -1)
+) order_detail
+left join (
+    select
+        member_id,
+        member_name
+    from dim_member_info
+) member_info
+on order_detail.member_id = member_info.member_id
+left join (
+    select
+        dish_id,
+        dish_category
+    from dim_dish_info
+) dish_info
+on order_detail.dish_id = dish_info.dish_id
+group by
+    order_detail.member_id,
+    member_info.member_name,
+    dish_info.dish_category,
+    date(payment_time);
+
 
 -- 1日各城市各店铺的stat
 drop table if exists dws_shop_city_stat;
@@ -87,6 +135,7 @@ create index if not exists shop_name_idx on dws_shop_city_stat (shop_name) using
 
 
 -- 数据装载
+-- 首日装载
 insert into dws_shop_city_stat
 select
     shop_location,
@@ -97,6 +146,23 @@ select
     sum(quantity * price)
 from dwd_order_detail
 where is_paid = '1'
+group by
+    shop_location,
+    shop_name,
+    date(payment_time);
+
+-- 每日装载
+# insert into dws_shop_city_stat
+select
+    shop_location,
+    shop_name,
+    date(payment_time),
+    bitmap_count(bitmap_union(to_bitmap(order_id))) order_count,
+    sum(quantity),
+    sum(quantity * price)
+from dwd_order_detail
+-- 获取当日增量数据
+where is_paid = '1' and date(payment_time) = date_add('2016-09-01', -1)
 group by
     shop_location,
     shop_name,
@@ -127,7 +193,7 @@ create index if not exists flavor_idx on dws_dish_stat (flavor) using bitmap com
 create index if not exists dish_category_idx on dws_dish_stat (dish_category) using bitmap comment 'dish_categoru列索引';
 
 
-
+-- 首日装载
 insert into dws_dish_stat
 select
     order_detail.dish_id,
@@ -147,6 +213,45 @@ from (
         price
     from dwd_order_detail
     where is_paid = '1'
+) order_detail
+inner join (
+    select
+        dish_id,
+        dish_category,
+        flavor,
+        dish_name
+    from dim_dish_info
+) dish_info
+on order_detail.dish_id = dish_info.dish_id
+group by
+    order_detail.dish_id,
+    dish_info.dish_name,
+    dish_info.flavor,
+    dish_info.dish_category,
+    date(order_detail.payment_time);
+
+
+-- 每日装载
+# insert into dws_dish_stat
+select
+    order_detail.dish_id,
+    dish_info.dish_name,
+    dish_info.flavor,
+    dish_info.dish_category,
+    date(order_detail.payment_time),
+    bitmap_count(bitmap_union(to_bitmap(order_detail.order_id))),
+    sum(order_detail.quantity),
+    sum(order_detail.quantity*order_detail.price)
+from (
+    select
+        order_id,
+        payment_time,
+        dish_id,
+        quantity,
+        price
+    from dwd_order_detail
+    -- 获取当日增量数据
+    where is_paid = '1' and date(payment_time) = date_add('2016-09-01', -1)
 ) order_detail
 inner join (
     select

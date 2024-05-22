@@ -15,6 +15,7 @@ properties(
 
 create index dish_category_idx on ads_dish_category_1day (dish_category) using bitmap comment 'dish_category列bitmap索引';
 
+-- 首日装载
 insert into ads_dish_category_1day
 select
     pay_date,
@@ -25,6 +26,17 @@ select
 from dws_member_dish_stat
 group by pay_date, dish_category
 order by pay_date, dish_category;
+
+-- 每日装载
+# insert into ads_dish_category_1day
+select
+    pay_date,
+    dish_category,
+    order_count,
+    slaves_volume,
+    total_sales
+from dws_member_dish_stat
+where pay_date = date_add('2016-09-01', -1);
 
 
 -- ads_dish_category 历史累积品类指标
@@ -43,6 +55,7 @@ properties(
 
 create index dish_category_idx on ads_dish_categroy (dish_category) using bitmap comment 'dish_category列bitmap索引';
 
+-- 首日装载
 insert into ads_dish_categroy
 select
     dish_category,
@@ -50,6 +63,17 @@ select
     slaves_volume,
     total_sales
 from ads_dish_category_1day;
+
+-- 每日装载
+# insert into ads_dish_categroy
+select
+    dish_category,
+    order_count,
+    slaves_volume,
+    total_sales
+from ads_dish_category_1day
+where pay_date = date_add('2016-09-01', -1);
+
 
 
 -- ads_city_1day 每日城市的统计指标
@@ -70,6 +94,7 @@ properties(
 
 create index shop_location_idx on ads_city_1day (shop_location) using bitmap comment 'shop_location列bitmap索引';
 
+-- 首日装载
 insert into ads_city_1day
 select
     pay_date,
@@ -78,6 +103,17 @@ select
     slaves_volume,
     total_sales
 from dws_shop_city_stat;
+
+-- 每日转载
+# insert into ads_city_1day
+select
+    pay_date,
+    shop_location,
+    order_count,
+    slaves_volume,
+    total_sales
+from dws_shop_city_stat
+where pay_date = date_add('2016-09-01', -1);
 
 
 -- ads_city 历史累积城市的统计指标
@@ -96,6 +132,7 @@ properties(
 
 create index shop_location_idx on ads_city (shop_location) using bitmap comment 'shop_location列bitmap索引';
 
+-- 首日装载
 insert into ads_city
 select
     shop_location,
@@ -103,6 +140,16 @@ select
     slaves_volume,
     total_sales
 from ads_city_1day;
+
+-- 每日装载
+# insert into ads_city
+select
+    shop_location,
+    order_count,
+    slaves_volume,
+    total_sales
+from ads_city_1day
+where pay_date = date_add('2016-09-01', -1);
 
 
 -- ads_shop_1day 每日店铺的统计指标
@@ -123,6 +170,7 @@ properties(
 
 create index if not exists shop_name_idx on ads_shop_1day (shop_name) using bitmap comment 'shop_name列bitmap索引';
 
+-- 首日装载
 insert into ads_shop_1day
 select
     pay_date,
@@ -131,6 +179,17 @@ select
     slaves_volume,
     total_sales
 from dws_shop_city_stat;
+
+-- 每日装载
+# insert into ads_shop_1day
+select
+    pay_date,
+    shop_name,
+    order_count,
+    slaves_volume,
+    total_sales
+from dws_shop_city_stat
+where pay_date = date_add('2016-09-01', -1);
 
 -- ads_shop 历史累积店铺的统计指标
 drop table if exists ads_shop;
@@ -148,6 +207,7 @@ properties(
 
 create index if not exists shop_name_idx on ads_shop (shop_name) using bitmap comment 'shop_name列bitmap索引';
 
+-- 首日装载
 insert into ads_shop
 select
     shop_name,
@@ -155,3 +215,13 @@ select
     slaves_volume,
     total_sales
 from ads_shop_1day;
+
+-- 每日装载
+# insert into ads_shop
+select
+    shop_name,
+    order_count,
+    slaves_volume,
+    total_sales
+from ads_shop_1day
+where pay_date = date_add('2016-09-01', -1);
