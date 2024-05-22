@@ -2,6 +2,8 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/doris/data_load.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/doris/dwd_to_dws.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/doris/dws_to_ads.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/doris/ods_to_dwd_and_dim.sql" dialect="MySQL" />
   </component>
 </project>

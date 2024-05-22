@@ -13,6 +13,7 @@ unique key(`member_id`)
 distributed by hash(`member_id`) buckets 1
 properties(
     "replication_num" = "1",
+    "enable_unique_key_merge_on_write" = "true",
     "bloom_filter_columns"="member_name,phone_number"
 );
 
@@ -35,6 +36,7 @@ unique key(`dish_id`)
 distributed by hash(`dish_id`) buckets 1
 properties(
     "replication_num" = "1",
+    "anable_unique_key_merge_on_write" = "true",
     "bloom_filter_columns" = "dish_name"
 );
 
@@ -114,7 +116,9 @@ select
     order_detail.quantity
 from (
     select
-        concat(substring(order_id, 1, 8), substring(order_id, 10)) as order_id,
+        if(substr(order_id, 9, 1) = '0',
+           concat(substring(order_id, 1, 8), substring(order_id, 10)),
+           order_id) order_id,
         member_name,
         shop_name,
         shop_location,
@@ -124,7 +128,7 @@ from (
         payment_time
     from private_station.ods_order_info
 ) order_info
-left join(
+inner join(
     select
         order_id,
         dish_name,
@@ -133,22 +137,20 @@ left join(
     from private_station.ods_order_detail
 ) order_detail
 on order_info.order_id = order_detail.order_id
-left join(
+inner join(
     select
         member_id,
         member_name
     from private_station.ods_member_info
 ) member_info
 on order_info.member_name = member_info.member_name
-left join(
+inner join(
     select
         dish_id,
         dish_name
     from private_station.ods_dish_info
 ) dish_info
 on order_detail.dish_name = dish_info.dish_name;
-
-
 
 
 

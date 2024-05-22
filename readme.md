@@ -121,7 +121,7 @@ ods_member_info(会员信息表):
 
 ![业务总线矩阵](./image/业务总线矩阵.png)
 
-# DWS与DIM层表设计
+# DWD与DIM层表设计
 
 根据业务业务总线矩阵进行多维数据模型设计，设计事实表与维度表
 
@@ -195,7 +195,7 @@ ods_member_info(会员信息表):
 
 - 各会员按照口味偏好进行聚类分析
 
-- 各会员按照品类编号进行聚类分析
+- 各会员按照品类偏好进行聚类分析
 
 - 各菜品之间相关性统计
 
@@ -218,3 +218,20 @@ ods_member_info(会员信息表):
 ![指标体系1](./image/指标体系1.png)
 
 ![指标体系2](./image/指标体系2.jpg)
+
+# DWS层表设计
+
+## dws_member_dish_stat
+
+采用aggregate数据模型
+
+| 字段          | 数据类型       | 列类型       | 聚合类型 | 描述     |
+| ------------- | -------------- | ------------ | -------- | -------- |
+| member_id     | bigint         | key column   |          | 用户id   |
+| member_name   | varchar(10)    | key column   |          | 用户名   |
+| dish_category | varchar(32)    | key column   |          | 类品id   |
+| pay_date      | date           | key column   |          | 支付日期 |
+| slaves_volume | int            | value column | sum      | 销量     |
+| total_sales   | decimal(16, 2) | value column | sum      | 销售额   |
+
+​	
