@@ -223,15 +223,56 @@ ods_member_info(会员信息表):
 
 ## dws_member_dish_stat
 
-采用aggregate数据模型
+采用aggregate数据模型，
 
-| 字段          | 数据类型       | 列类型       | 聚合类型 | 描述     |
-| ------------- | -------------- | ------------ | -------- | -------- |
-| member_id     | bigint         | key column   |          | 用户id   |
-| member_name   | varchar(10)    | key column   |          | 用户名   |
-| dish_category | varchar(32)    | key column   |          | 类品id   |
-| pay_date      | date           | key column   |          | 支付日期 |
-| slaves_volume | int            | value column | sum      | 销量     |
-| total_sales   | decimal(16, 2) | value column | sum      | 销售额   |
+| 字段          | 数据类型       | 列类型       | 聚合类型 | 描述           |
+| ------------- | -------------- | ------------ | -------- | -------------- |
+| member_id     | bigint         | key column   |          | 用户id         |
+| member_name   | varchar(10)    | key column   |          | 用户名         |
+| dish_category | varchar(32)    | key column   |          | 类品id         |
+| pay_date      | date           | key column   |          | 支付日期       |
+| order_count   | int            | value column | sum      | 订单量         |
+| slaves_volume | int            | value column | sum      | 订单明细销量   |
+| total_sales   | decimal(16, 2) | value column | sum      | 订单明细销售额 |
 
-​	
+## dws_shop_city_stat
+
+采用aggregate数据模型，1日各城市各店铺的stat
+
+| 字段          | 数据类型       | 列类型       | 聚合类型 | 描述           |
+| ------------- | -------------- | ------------ | -------- | -------------- |
+| shop_location | varchar(10)    | key column   |          | 店铺所在地     |
+| shop_name     | varchar(32)    | key column   |          | 店铺名         |
+| pay_date      | date           | key column   |          | 支付日期       |
+| order_count   | int            | value column | sum      | 订单量         |
+| slaves_volume | int            | value column | sum      | 订单明细销量   |
+| total_sales   | decimal(16, 2) | value column | sum      | 订单明细销售额 |
+
+## dws_dish_stat
+
+采用aggregate数据模型，1日各品类各口味各菜品的stat
+
+| 字段          | 数据类型       | 列类型       | 聚合类型 | 描述           |
+| ------------- | -------------- | ------------ | -------- | -------------- |
+| dish_id       | bigint         | key column   |          | 菜品id         |
+| dish_name     | varchar(64)    | key column   |          | 菜品名称       |
+| flavor        | varchar(10)    | key column   |          | 菜品口味       |
+| dish_category | varchar(32)    | key column   |          | 菜品类别       |
+| pay_date      | date           | key column   |          | 支付日期       |
+| order_count   | int            | value column | sum      | 订单量         |
+| slaves_volume | int            | value column | sum      | 订单明细销量   |
+| total_sales   | decimal(16, 2) | value column | sum      | 订单明细销售额 |
+
+# ADS层表设计
+
+## ads_dish_catagory_1day
+
+采用aggregate数据模型，每日各品类别的销售指标
+
+| 字段          | 数据类型       | 列类型       | 聚合类型 | 描述           |
+| ------------- | -------------- | ------------ | -------- | -------------- |
+| pay_date      | date           | key_column   |          | 支付日期       |
+| dish_category | varchar(64)    | key_column   |          | 品类           |
+| slaves_volume | int            | value_column | sum      | 订单明细销量   |
+| total_sales   | decimal(16, 2) | value_column | sum      | 订单明细销售额 |
+
