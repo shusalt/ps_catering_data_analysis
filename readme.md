@@ -276,3 +276,354 @@ ods_member_info(会员信息表):
 | slaves_volume | int            | value_column | sum      | 订单明细销量   |
 | total_sales   | decimal(16, 2) | value_column | sum      | 订单明细销售额 |
 
+## ads_dish_category
+
+历史累积品类指标，采用aggregate数据模型
+
+```mysql
+-- ads_dish_category 历史累积品类指标
+drop table if exists ads_dish_category;
+create table if not exists ads_dish_categroy(
+    `dish_category` varchar(64) comment '品类',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`dish_category`)
+distributed by hash(`dish_category`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+
+create index dish_category_idx on ads_dish_categroy (dish_category) using bitmap comment 'dish_category列bitmap索引';
+```
+
+## ads_city_1day
+
+每日城市的统计指标，采用aggreagte数据模型
+
+```mysql
+-- ads_city_1day 每日城市的统计指标
+drop table if exists ads_city_1day;
+create table if not exists ads_city_1day(
+    `pay_date` date comment '支付日期',
+    `shop_location` varchar(10) comment '店铺所在地',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销量',
+    `total_sales` decimal sum default '0' comment '销售额'
+)
+aggregate key(`pay_date`, `shop_location`)
+distributed by hash(`pay_date`) buckets 1
+properties(
+    "replication_num" = "1",
+    "bloom_filter_columns" = "pay_date"
+);
+
+create index shop_location_idx on ads_city_1day (shop_location) using bitmap comment 'shop_location列bitmap索引';
+```
+
+## ads_city
+
+历史累积城市的统计指标，采用aggregate数据模型
+
+```mssql
+-- ads_city 历史累积城市的统计指标
+drop table if exists ads_city;
+create table if not exists ads_city(
+    `shop_location` varchar(10) comment '店铺所在地',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销量',
+    `total_sales` decimal sum default '0' comment '销售额'
+)
+aggregate key(`shop_location`)
+distributed by hash(`shop_location`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+
+create index shop_location_idx on ads_city (shop_location) using bitmap comment 'shop_location列bitmap索引';
+```
+
+## ads_shop_1day
+
+每日店铺的统计指标，采用aggregate数据模型
+
+```mysql
+-- ads_shop_1day 每日店铺的统计指标
+drop table if exists ads_shop_1day;
+create table if not exists ads_shop_1day(
+    `pay_date` date comment '支付时间',
+    `shop_name` varchar(32) comment '店铺名',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`pay_date`, `shop_name`)
+distributed by hash(`pay_date`) buckets 1
+properties(
+    "replication_num" = "1",
+    "bloom_filter_columns" = "pay_date"
+);
+
+create index if not exists shop_name_idx on ads_shop_1day (shop_name) using bitmap comment 'shop_name列bitmap索引';
+```
+
+## ads_shop
+
+历史累积店铺的统计指标，采用aggregate数据模型
+
+```mysql
+drop table if exists ads_shop;
+create table if not exists ads_shop(
+    `shop_name` varchar(32) comment '店铺名',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`shop_name`)
+distributed by hash(`shop_name`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+
+create index if not exists shop_name_idx on ads_shop (shop_name) using bitmap comment 'shop_name列bitmap索引';
+```
+
+## ads_city_month
+
+月季各城市盈利额与各城市盈利总额平均值对比，采用aggregate数据模型
+
+```mysql
+-- 月季各城市盈利额与各城市盈利总额平均值对比
+drop table if exists ads_city_month;
+create table if not exists ads_city_month(
+    `month_date` varchar(10) comment 'yyyy-MM',
+    `shop_location` varchar(10) comment '店铺所在地',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额',
+    `score` decimal(16, 2) sum default '0' comment 'kpi评分',
+    `target` decimal(16, 2) replace default '58000' comment '目标值'
+)
+aggregate key(`month_date`, `shop_location`)
+distributed by hash(`month_date`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+## ads_shop_month
+
+月季度各店铺盈利额与各店铺盈利总额平均值对比，采用aggregate数据模型
+
+```mysql
+-- ads_shop_month 月季度各店铺盈利额与各店铺盈利总额平均值对比
+drop table if exists ads_shop_month;
+create table if not exists ads_shop_month(
+    `month_date` varchar(10) comment 'yyyy-MM',
+    `shop_name` varchar(32) comment '店铺名',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额',
+    `score` decimal(16, 2) sum default '0' comment 'kpi评分',
+    `target`  decimal(16, 2) replace default '0' comment '目标值'
+)
+aggregate key(`month_date`, `shop_name`)
+distributed by hash(`month_date`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+## ads_member
+
+历史各会消费的统计指标，采用aggregate数据模型
+
+```mysql
+- 历史各会消费的统计指标
+drop table if exists ads_member;
+create table if not exists ads_member(
+    `member_id` bigint comment '会员id',
+    `member_name` varchar(10) comment '会员名',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销售量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`member_id`, `member_name`)
+distributed by key(`member_id`) buckets 1
+properties(
+    "replication_num" = "1",
+    "bloom_filter_columns" = "member_id, member_name"
+);
+```
+
+## ads_member_dish_category
+
+历史至今各会员对品类消费情况，采用aggregate数据模型
+
+```mysql
+-- 历史至今各会员对品类消费情况
+drop table if exists ads_member_dish_category;
+create table if not exists ads_member_dish_category(
+    `member_id` bigint comment '会员id',
+    `member_name` varchar(10) comment '会员名',
+    `dish_category` varchar(32) comment '品类',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销售量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`member_id`, `member_name`, `dish_category`)
+distributed by hash(`member_id`) buckets 1
+properties(
+    "replication_num" = "1",
+    "bloom_filter_columns" = "member_id, member_name"
+);
+```
+
+## ads_dish_name_1day
+
+每日各菜品销售情况的统计指标，采用aggregate数据模型
+
+```mysql
+-- 每日各菜品销售情况的统计指标
+drop table if exists ads_dish_name_1day;
+create table if not exists ads_dish_name_1day(
+    `pay_date` date comment '支付日期',
+    `dish_id` bigint comment '菜品id',
+    `dish_name` varchar(64) comment '菜品名称',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销售量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`pay_date`, `dish_id`, `dish_name`)
+distributed by hash(`pay_date`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+## ads_dish_name_month
+
+每月各菜品销售情况的统计指标，采用aggregate数据模型
+
+```mysql
+-- 每月各菜品销售情况的统计指标
+drop table if exists ads_dish_name_month;
+create table if not exists ads_dish_name_month(
+    `month_date` varchar(10) comment 'yyyy-MM',
+    `dish_id` bigint comment '菜品id',
+    `dish_name` varchar(64) comment '菜品名称',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销售量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`month_date`, `dish_id`, `dish_name`)
+distributed by hash(`month_date`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+## ads_dish_name
+
+历史各菜品销售情况的统计指标，采用aggregate数据模型
+
+```mysql
+-- 历史各菜品销售情况的统计指标
+drop table if exists ads_dish_name;
+create table if not exists ads_dish_name(
+    `dish_id` bigint comment '菜品id',
+    `dish_name` varchar(64) comment '菜品名称',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销售量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`dish_id`, `dish_name`)
+distributed by hash(`dish_id`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+## ads_flavor_1day
+
+每日口味销售情况的统计指标，采用aggregate数据模型
+
+```mysql
+drop table if exists ads_flavor_1day;
+create table if not exists ads_flavor_1day(
+    `pay_date` date comment '支付时间',
+    `flavor` varchar(32) comment '口味',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销售量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`pay_date`, `flavor`)
+distributed by hash(`pay_date`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+## ads_flavor_month
+
+每月口味销售情况的统计指标，采用aggregate数据模型
+
+```mysql
+drop table if exists ads_flavor_month;
+create table if not exists ads_flavor_month(
+    `month_date` varchar(10) comment 'yyyy-MM',
+    `flavor` varchar(32) comment '口味',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销售量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`month_date`, `flavor`)
+distributed by hash(`month_date`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+## ads_flavor
+
+历史口味销售情况的统计指标，采用aggregate数据模型
+
+```mysql
+drop table if exists ads_flavor;
+create table if not exists ads_flavor(
+    `flavor` varchar(32) comment '口味',
+    `order_count` int sum default '0' comment '订单量',
+    `slaves_volume` int sum default '0' comment '销售量',
+    `total_sales` decimal(16, 2) sum default '0' comment '销售额'
+)
+aggregate key(`flavor`)
+distributed by hash(`flavor`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+## ads_dish_category_name_month
+
+每月各类品各菜品销售占比统计，采用aggregate数据模型
+
+```mysql
+drop table if exists ads_dish_category_name_month;
+create table if not exists ads_dish_category_name_month(
+    `date_month` varchar(10) comment 'yyyy-MM',
+    `dish_category` varchar(32) comment '品类',
+    `dish_name` varchar(64) comment '菜品',
+    `total_sales` decimal(16, 2) replace default '0' comment '销售额',
+    `total_sales_sum` decimal(16, 2) replace default '0' comment '品类总销售额',
+    `proportion` decimal(16, 2) replace default '0' comment '占比'
+)
+aggregate key(`date_month`, `dish_category`, `dish_name`)
+distributed by hash(`date_month`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+
+
