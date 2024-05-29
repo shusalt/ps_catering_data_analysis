@@ -356,7 +356,7 @@ properties (
 
 
 -- 肉类：猪肉类、羊肉类、其他肉类、牛肉类、家禽类
--- 海/河鲜类：鱼类、蟹类、虾类、其他水产、贝壳类
+-- 海_河鲜类：鱼类、蟹类、虾类、其他水产、贝壳类
 -- 饮料类：饮料类
 -- 酒类：红酒类、啤酒类、白酒类
 -- 果蔬类：叶菜类、茎菜类、花菜类、海藻类、果菜类、根菜类
@@ -367,11 +367,11 @@ insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALU
 insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1003, '肉类', '其他肉类');
 insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1004, '肉类', '牛肉类');
 insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1005, '肉类', '家禽类');
-insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1006, '海/河鲜类', '鱼类');
-insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1007, '海/河鲜类', '蟹类');
-insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1008, '海/河鲜类', '虾类');
-insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1009, '海/河鲜类', '其他水产');
-insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1010, '海/河鲜类', '贝壳类');
+insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1006, '海_河鲜类', '鱼类');
+insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1007, '海_河鲜类', '蟹类');
+insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1008, '海_河鲜类', '虾类');
+insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1009, '海_河鲜类', '其他水产');
+insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1010, '海_河鲜类', '贝壳类');
 insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1011, '饮料类', '饮料类');
 insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1012, '酒类', '红酒类');
 insert into dish_category_dic (`id`, `base_category`, `composite_category`) VALUES (1013, '酒类', '啤酒类');
@@ -493,3 +493,43 @@ on tb3.category_id = category_dic.id
 group by member_id,
     member_name,
     base_category;
+
+
+
+
+-- 会员对品类偏好聚类分析结果
+drop table if exists da_member_category_predictions;
+create table if not exists da_member_category_predictions(
+    `member_id` bigint comment '会员id',
+    `member_name` varchar(10) comment '会员名称',
+    `staple_foods` int comment '主食类消费次数',
+    `snacks` int comment '小吃类消费次数',
+    `fruits_and_vegetables` int comment '果蔬类消费次数',
+    `seafood_or_river_delicacies` int comment '海/河鲜类消费次数',
+    `meat` int comment '肉食类消费次数',
+    `liquor` int comment '酒类消费次数',
+    `beverages` int comment '饮料类消费次数',
+    `prediction` int comment '聚类结果'
+)
+duplicate key(`member_id`)
+distributed by hash(`member_id`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+
+
+
+-- 创建聚类分析聚类中心结果
+drop table if exists mc_cluster_center_analysis_result;
+create table if not exists mc_cluster_center_analysis_result(
+    `features` varchar(20) comment '品类特征',
+    `member_cluster0` double comment '会员群0中心',
+    `member_cluster1` double comment '会员群1中心',
+    `member_cluster2` double comment '会员群2中心',
+    `member_cluster3` double comment '会员群3中心'
+)
+duplicate key(`features`)
+distributed by hash(`features`) buckets 1
+properties(
+    "replication_num" = "1"
+);
