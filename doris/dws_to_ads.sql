@@ -616,7 +616,7 @@ select
     total_sales
 from ads_flavor_1day
 -- 每日增量数据
-where pay_date = date_add('2016-09-01', -1)
+where pay_date = date_add('2016-09-01', -1);
 
 
 
