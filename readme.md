@@ -709,46 +709,46 @@ properties(
 
 **Visualization1：**
 
-![image-20240530204531032](../ps_catering_data_analysis/image/vis1.png)
+![image-20240530204531032](./image/vis1.png)
 
 **Visualization2:**
 
-![image-20240530204710030](../ps_catering_data_analysis/image/vis2.png)
+![image-20240530204710030](./image/vis2.png)
 
 **Visualization3:**
 
-![image-20240530204835427](../ps_catering_data_analysis/image/vis3.png)
+![image-20240530204835427](./image/vis3.png)
 
 **Visualization4:**
 
-![image-20240530205024887](../ps_catering_data_analysis/image/vis4.png)
+![image-20240530205024887](./image/vis4.png)
 
 **Visualization5:**
 
-![image-20240530205134446](../ps_catering_data_analysis/image/vis5.png)
+![image-20240530205134446](./image/vis5.png)
 
 **Visualization6:**
 
-![image-20240530205230931](../ps_catering_data_analysis/image/vis6.png)
+![image-20240530205230931](./image/vis6.png)
 
 **Visualization7:**
 
-![image-20240530205328834](../ps_catering_data_analysis/image/vis7.png)
+![image-20240530205328834](./image/vis7.png)
 
 **Visualization8:**
 
-![image-20240530205432817](../ps_catering_data_analysis/image/vis8.png)
+![image-20240530205432817](./image/vis8.png)
 
 Visualization9:
 
-![image-20240530205538202](../ps_catering_data_analysis/image/vis9.png)
+![image-20240530205538202](./image/vis9.png)
 
 **Visualization10:**
 
-![image-20240530205643576](../ps_catering_data_analysis/image/vis10.png)
+![image-20240530205643576](./image/vis10.png)
 
 **Visualization11:**
 
-![image-20240530205734022](../ps_catering_data_analysis/image/vis11.png)
+![image-20240530205734022](./image/vis11.png)
 
 整体的数据可视化文件在 **./ps_catering_data_analysis/doris/数据可视化.pbix** 或 **./ps_catering_data_analysis/doris/数据可视化.pdf** 中
