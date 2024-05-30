@@ -219,7 +219,7 @@ ods_member_info(会员信息表):
 
 ![指标体系1](./image/指标体系1.png)
 
-![指标体系2](./image/指标体系2.jpg)
+![指标体系2](./image/指标体系2.png)
 
 # DWS层表设计
 
@@ -629,6 +629,8 @@ properties(
 
 # 探索性分析
 
+## 聚合分析
+
 利用Pyspark的ML对会员订单数据，进行聚类分析，主要进行会员口味与品类偏好进行聚类分析，探索各个会员群体；
 
 采用Kmeans聚类算法，进行分析聚类分析
@@ -702,6 +704,27 @@ properties(
 ```
 
 相关的数据处理与装载SQL，在 **./ps_catering_data_analysis/doris/exploratory_analysis.sql** 中
+
+**用户口味聚类分析流程步骤：**
+
+（1）使用Pyspark通过Spark Doris Connector组件连接Doris，读取Doris表数据，Pyspark读取Doris数据代码格式：
+
+```python
+    df = spark.read.format("doris") \
+        .option("doris.table.identifier", "database.table") \
+        .option("doris.fenodes", "your_doris_fe_hostname:your_doris_fe_resful_port") \
+        .option("user", "your_name") \
+        .option("password", "your_password") \
+        .load()
+```
+
+（2）聚类分析流程：
+
+![会员口味偏好聚类分析流程](./image/会员口味偏好聚类分析流程.png)
+
+**会员品类偏好聚类分析：**
+
+![会员品类偏好聚类分析流程](./image/会员品类偏好聚类分析流程.png)
 
 使用Pyspark的ML的Kmeans算法，对接会员的口味与品味偏好数据进行聚类分析，相关代码在 **./ps_catering_data_analysis/pyspark_data_analysis** 中
 
