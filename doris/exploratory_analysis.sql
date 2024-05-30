@@ -533,3 +533,55 @@ distributed by hash(`features`) buckets 1
 properties(
     "replication_num" = "1"
 );
+
+
+
+-- 菜品相关性分析
+select
+    dish_name
+from dim_dish_info
+group by dish_name;
+
+
+    select
+        member_id,
+        member_name,
+        dish_name,
+        total_sales,
+        count(dish_name) over(partition by member_id) sum_num
+    from (
+        select
+            member_id,
+            member_name,
+            dish_name,
+            sum(sales) total_sales
+        from (
+            select
+                order_detail.member_id,
+                member.member_name,
+                dish.dish_name,
+                order_detail.sales
+            from (
+                select
+                    member_id,
+                    dish_id,
+                    quantity * price as sales
+                from dwd_order_detail
+            ) order_detail
+            inner join (
+                select
+                    member_id,
+                    member_name
+                from dim_member_info
+            ) member
+            on order_detail.member_id = member.member_id
+            inner join (
+                select
+                    dish_id,
+                    dish_name
+                from dim_dish_info
+            ) dish
+            on order_detail.dish_id = dish.dish_id
+        ) tb1
+        group by member_id, member_name, dish_name
+    ) tb2

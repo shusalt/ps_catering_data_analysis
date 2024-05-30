@@ -197,6 +197,8 @@ ods_member_info(会员信息表):
 
 - 各会员按照品类偏好进行聚类分析
 
+- 时间序列分析，预测未来7天的销量与销售额
+
 - 各菜品之间相关性统计
 
 - 菜品套餐组合分析
@@ -625,3 +627,128 @@ properties(
 );
 ```
 
+# 探索性分析
+
+利用Pyspark的ML对会员订单数据，进行聚类分析，主要进行会员口味与品类偏好进行聚类分析，探索各个会员群体；
+
+采用Kmeans聚类算法，进行分析聚类分析
+
+在进行聚类分析之前，需要对相关数据进行转换、处理，设计与开发相关表flavor_dic(口味字典表)，dish_category_dic(品类字典)、data_analysis_member_flavor_pre(会员口味偏好统计)、da_member_category_pre(会员品类偏好统计)
+
+**flavor_dic(口味字典表)**
+
+```mysql
+drop table if exists flavor_dic;
+create table if not exists flavor_dic(
+    `id` int comment 'id',
+    `base_flavor` varchar(10) comment '基础口味',
+    `composite_flavor` varchar(10) comment  '复合口味'
+)
+unique key(`id`)
+distributed by hash(`id`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+**dish_category_dic(品类字典)**
+
+```mysql
+drop table if exists dish_category_dic;
+create table if not exists dish_category_dic(
+    `id` int comment 'id',
+    `base_category` varchar(32) comment '基础品类',
+    `composite_category` varchar(32) comment '细分品类'
+)
+unique key(`id`)
+distributed by hash(`id`) buckets 1
+properties (
+    "replication_num" = "1"
+);
+```
+
+**data_analysis_member_flavor_pre(会员口味偏好统计)**
+
+```mysql
+drop table if exists data_analysis_member_flavor_pre;
+create table if not exists data_analysis_member_flavor_pre(
+    `member_id` bigint comment '会员id',
+    `member_name` varchar(10) comment '会员名',
+    `base_flavor` varchar(10) comment '基础口味',
+    `consumption_count` bigint comment '消防次数'
+)
+duplicate key(`member_id`, `member_name`, `base_flavor`)
+distributed by hash(`member_id`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+**da_member_category_pre(会员品类偏好统计)**
+
+```mysql
+drop table if exists da_member_category_pre;
+create table if not exists da_member_category_pre(
+    `member_id` bigint comment '会员id',
+    `member_name` varchar(10) comment '会员名',
+    `base_category` varchar(32) comment '基础品类',
+    `composite_category` int comment '消费次数'
+)
+duplicate key(`member_id`)
+distributed by hash(`member_id`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+相关的数据处理与装载SQL，在 **./ps_catering_data_analysis/doris/exploratory_analysis.sql** 中
+
+使用Pyspark的ML的Kmeans算法，对接会员的口味与品味偏好数据进行聚类分析，相关代码在 **./ps_catering_data_analysis/pyspark_data_analysis** 中
+
+# 数据可视化
+
+**Visualization1：**
+
+![image-20240530204531032](../ps_catering_data_analysis/image/vis1.png)
+
+**Visualization2:**
+
+![image-20240530204710030](../ps_catering_data_analysis/image/vis2.png)
+
+**Visualization3:**
+
+![image-20240530204835427](../ps_catering_data_analysis/image/vis3.png)
+
+**Visualization4:**
+
+![image-20240530205024887](../ps_catering_data_analysis/image/vis4.png)
+
+**Visualization5:**
+
+![image-20240530205134446](../ps_catering_data_analysis/image/vis5.png)
+
+**Visualization6:**
+
+![image-20240530205230931](../ps_catering_data_analysis/image/vis6.png)
+
+**Visualization7:**
+
+![image-20240530205328834](../ps_catering_data_analysis/image/vis7.png)
+
+**Visualization8:**
+
+![image-20240530205432817](../ps_catering_data_analysis/image/vis8.png)
+
+Visualization9:
+
+![image-20240530205538202](../ps_catering_data_analysis/image/vis9.png)
+
+**Visualization10:**
+
+![image-20240530205643576](../ps_catering_data_analysis/image/vis10.png)
+
+**Visualization11:**
+
+![image-20240530205734022](../ps_catering_data_analysis/image/vis11.png)
+
+整体的数据可视化文件在 **./ps_catering_data_analysis/doris/数据可视化.pbix** 或 **./ps_catering_data_analysis/doris/数据可视化.pdf** 中
