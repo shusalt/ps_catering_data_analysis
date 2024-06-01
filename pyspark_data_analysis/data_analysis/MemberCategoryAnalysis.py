@@ -7,7 +7,7 @@ from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.ml.clustering import KMeans
 import matplotlib.pyplot as plt
 
-from data_analysis.comm.SparkToDoris import SparkToDoris
+from data_analysis.comm.SparkConnDoris import SparkConnDoris
 
 if __name__ == '__main__':
     """
@@ -101,8 +101,8 @@ if __name__ == '__main__':
                 "member_cluster2", "member_cluster3")
     #  将结果写入 doris
     print(mc_cluster_center_analysis_result2.show())
-    spark_to_doris = SparkToDoris(mc_cluster_center_analysis_result2, "mc_cluster_center_analysis_result")
-    spark_to_doris.to_doris()
+    spark_to_doris = SparkConnDoris(mc_cluster_center_analysis_result2, "mc_cluster_center_analysis_result")
+    spark_to_doris.write_doris()
     # mc_cluster_center_analysis_result2.write.format("doris") \
     #     .option("doris.table.identifier", "private_station.mc_cluster_center_analysis_result") \
     #     .option("doris.fenodes", "172.20.10.3:8070") \
