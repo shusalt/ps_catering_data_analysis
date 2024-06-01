@@ -590,7 +590,8 @@ group by dish_name;
 drop table if exists da_date_series_amount_analysis;
 create table if not exists da_date_series_amount_analysis(
     `date` varchar(32) comment '日期',
-    `total_sales` decimal(16, 2) comment '总额'
+    `quantity` int comment '销量',
+    `total_sales` float comment '总额'
 )
 duplicate key(`date`)
 distributed by hash(`date`) buckets 1
@@ -603,6 +604,7 @@ properties(
 insert into da_date_series_amount_analysis
 select
     date_format(payment_time, '%Y-%m-%d') date,
+    sum(quantity) quantity,
     sum(quantity * price) total_sales
 from dwd_order_detail
 where payment_time is not null
