@@ -728,7 +728,7 @@ properties(
 
 使用Pyspark的ML的Kmeans算法，对接会员的口味与品味偏好数据进行聚类分析，相关代码在 **./ps_catering_data_analysis/pyspark_data_analysis** 中
 
-## 时间序列分析
+## 时间序列分析概述
 
 ### 什么是时序模式
 
@@ -794,6 +794,88 @@ properties(
 
   - 差分运算
   - ARIMA模型
+
+## 时序序列分析
+
+利用时间序分析，预测未来7天的销量与销售额
+
+时间序列数据表：
+
+```mysql
+drop table if exists da_date_series_amount_analysis;
+create table if not exists da_date_series_amount_analysis(
+    `date` varchar(32) comment '日期',
+    `quantity` int comment '销量',
+    `total_sales` decimal(16, 2) comment '总额'
+)
+duplicate key(`date`)
+distributed by hash(`date`) buckets 1
+properties(
+    "replication_num" = "1"
+);
+```
+
+**时间序列分析步骤：**
+
+**(1)读取时间序列数据**
+
+读取doris的da_date_series_amount_analysis数据表，并将其转换为pd_df
+
+```python
+    spark = SparkSession.builder \
+        .master("local[2]") \
+        .appName("DataSeriesAnalysis") \
+        .getOrCreate()
+
+    df = spark.read.format("doris") \
+        .option("doris.table.identifier", "private_station.da_date_series_amount_analysis") \
+        .option("doris.fenodes", "172.20.10.3:8070") \
+        .option("user", "root") \
+        .option("password", "") \
+        .load()
+```
+
+**(2)ADF(单位根检验)，检测时序数据的平稳性**
+
+使用 **statsmodels.tsa.stattools.adfuller()** 函数进行检测，检验的p值小于显着性水平（0.05）,才判断该时序数据是平稳的，分别对 "quantity" 和 "total_sales" 列进行：
+
+- quantity的ADF检验：
+
+![image-20240602011000337](./image/quantity列的ADF检验后统计值.png)
+
+quantity的p值大于0.05，后续需要进行差分
+
+- total_sales的ADF检验
+
+  ![image-20240602011729572](./image/total_sales列的ADF检验后统计值.png)
+
+total_sales的p值大于0.05，后续需求进行差分
+
+**(3)找出合适的差分i**
+
+绘制原始时序图和自相关图、差分时序图和差分自相关图，找出合适的差分i
+
+quantity列：
+
+![image-20240602021146706](./image/quantity列时序图.png)
+
+total_sales列：
+
+![image-20240602021337134](./image/total_sales列时序图.png)
+
+根据时序图和自相关图，这里我们将差分设置为1
+
+**(4)绘制偏自相关图，根据相关图比较，进行定阶**
+
+拖尾性：ACF或者PACF值都落在两倍标准差范围内，且不是一致趋于零。
+
+截尾性：截尾是指时间序列的自相关函数（ACF）或偏自相关函数（PACF）在某阶后均为0的性质（比如AR的PACF）
+
+![image-20240602030807992](./image/quantity和total_sales偏自相关图.png)
+
+根据与步骤(3)的比较，得知，1阶差分自相关图呈现1阶拖尾，1阶差分偏自相关图呈现1阶结尾，则使用AR(1)模型拟合1阶差分后的序列数据，对原始序列数据建立ARIMA(1,1,0)模型;
+
+**(5)建立ARIMA模型**
 
 
 
