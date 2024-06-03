@@ -873,11 +873,27 @@ total_sales列：
 
 ![image-20240602030807992](./image/quantity和total_sales偏自相关图.png)
 
-根据与步骤(3)的比较，得知，1阶差分自相关图呈现1阶拖尾，1阶差分偏自相关图呈现1阶结尾，则使用AR(1)模型拟合1阶差分后的序列数据，对原始序列数据建立ARIMA(1,1,0)模型;
+根据与步骤(3)的比较，得知，1阶差分自相关图呈现1阶拖尾，1阶差分偏自相关图呈现1阶结尾，则使用AR(1)模型拟合1阶差分后的序列数据，对原始序列数据建立ARIMA(1,1,1)模型;
 
 **(5)建立ARIMA模型**
 
+根据绘图结果对比，最终定阶为 p=1、i=1、q=0，建立ARIMA(1, 1, 0)模型
 
+```python
+    from statsmodels.tsa.arima.model import ARIMA
+
+    # 定义时序模型
+    model_quantity = ARIMA(pd_df['quantity'].to_numpy(), order=(1, 1, 0))
+    model_total_sales = ARIMA(pd_df['total_sales'].to_numpy(), order=(1, 1, 0))
+```
+
+根据最终拟合结果，得出拟合预测出的结果，差不多都是一样值，说明该定阶效果不是很好，更改定阶 p=1 i=1 q=1
+
+ARIMA(1, 0, 1)
+
+**(6)预测未来7天的销量与销售额**
+
+![image-20240603144743568](./image/时序分析预测结果.png)
 
 # 数据可视化
 

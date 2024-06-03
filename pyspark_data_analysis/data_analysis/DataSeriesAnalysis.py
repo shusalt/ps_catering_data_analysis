@@ -29,12 +29,12 @@ if __name__ == '__main__':
     from statsmodels.tsa.stattools import adfuller
     from numpy import log
 
-    result1 = adfuller(pd_df['quantity'].dropna())
-    print("ADF Statistic:{}".format(result1[0]))
-    print("p-value:{}".format(result1[1]))
-    result2 = adfuller(pd_df['total_sales'].dropna())
-    print("ADF Statistic:{}".format(result2[0]))
-    print("p-value:{}".format(result2[1]))
+    # result1 = adfuller(pd_df['quantity'].dropna())
+    # print("ADF Statistic:{}".format(result1[0]))
+    # print("p-value:{}".format(result1[1]))
+    # result2 = adfuller(pd_df['total_sales'].dropna())
+    # print("ADF Statistic:{}".format(result2[0]))
+    # print("p-value:{}".format(result2[1]))
 
     # 引入绘图库
     # 绘制原始时序图和自相关图、差分时序图和差分自相关图，找出合适的差分i
@@ -76,13 +76,20 @@ if __name__ == '__main__':
 
     # 绘制偏自相关图, 差分设置为1
     # 选取合适的AR(p)的p阶、MA(q)的q阶
-    fig3, axes3 = plt.subplots(2, 2, sharex=True)
-    plot_pacf(pd_df['quantity'].diff().dropna().to_numpy(), ax=axes3[0, 0], title="quantity pacf")
-    plot_pacf(pd_df['total_sales'].diff().dropna().to_numpy(), ax=axes3[0, 1], title="total_sales pacf")
-    plt.show()
+    # fig3, axes3 = plt.subplots(2, 2, sharex=True)
+    # plot_pacf(pd_df['quantity'].diff().dropna().to_numpy(), ax=axes3[0, 0], title="quantity pacf")
+    # plot_pacf(pd_df['total_sales'].diff().dropna().to_numpy(), ax=axes3[0, 1], title="total_sales pacf")
+    # plt.show()
 
-    # 引入时间序列分析模型，SARIMAX 算法
+    # 根据相关绘图分析，最终定阶为：p:1 i=1 q=0
+    # 引入时间序列分析模型，ARIMA 算法
     # tsa: 时间序列分析
-    from statsmodels.tsa.statespace.sarimax import SARIMAX
+    from statsmodels.tsa.arima.model import ARIMA
 
     # 定义时序模型
+    model_quantity = ARIMA(pd_df['quantity'], order=(1, 1, 1)).fit()
+    model_total_sales = ARIMA(pd_df['total_sales'], order=(1, 1, 1)).fit()
+
+    print(model_quantity.forecast(7))
+
+    print(model_total_sales.forecast(7))
